@@ -949,10 +949,10 @@ DuAEF.DuAE.Layer.getPuppetPins = function (layer)
 }
 
 /**
-* Aligns a layer in position to another layer
-* @param {Layer} layer - The layer to align.
-* @param {Layer} target - The reference layer.
-*/
+	* Aligns a layer in position to another layer
+	* @param {Layer} layer - The layer to align.
+	* @param {Layer} target - The reference layer.
+	*/
 DuAEF.DuAE.Layer.alignPosition = function (layer, target)
 {
 	//parent to target
@@ -973,10 +973,10 @@ DuAEF.DuAE.Layer.alignPosition = function (layer, target)
 }
 
 /**
-* Aligns a layer's orientation to another layer
-* @param {Layer} layer - The layer to align.
-* @param {Layer} target - The reference layer.
-*/
+	* Aligns a layer's orientation to another layer
+	* @param {Layer} layer - The layer to align.
+	* @param {Layer} target - The reference layer.
+	*/
 DuAEF.DuAE.Layer.alignOrientation = function (layer, target)
 {
 	//parent to target
@@ -996,10 +996,10 @@ DuAEF.DuAE.Layer.alignOrientation = function (layer, target)
 }
 
 /**
-* Aligns a layer's scale to another layer
-* @param {Layer} layer - The layer to align.
-* @param {Layer} target - The reference layer.
-*/
+	* Aligns a layer's scale to another layer
+	* @param {Layer} layer - The layer to align.
+	* @param {Layer} target - The reference layer.
+	*/
 DuAEF.DuAE.Layer.alignScale = function (layer, target)
 {
 	//parent to target
@@ -1019,10 +1019,10 @@ DuAEF.DuAE.Layer.alignScale = function (layer, target)
 }
 
 /**
-* Aligns a layer's opcaity to another layer
-* @param {Layer} layer - The layer to align.
-* @param {Layer} target - The reference layer.
-*/
+	* Aligns a layer's opcaity to another layer
+	* @param {Layer} layer - The layer to align.
+	* @param {Layer} target - The reference layer.
+	*/
 DuAEF.DuAE.Layer.alignOpacity = function (layer, target)
 {
 	var comp = layer.containingComp;
@@ -1033,14 +1033,14 @@ DuAEF.DuAE.Layer.alignOpacity = function (layer, target)
 }
 
 /**
-* Aligns the layers' transformations (position, rotation, scale) to another layer
-* @param {Layer[]|LayerCollection} layers - The layers to align.
-* @param {Layer} target - The reference layer.
-* @param {boolean} [position=true] - True to align position.
-* @param {boolean} [rotation=true] - True to align orientation.
-* @param {boolean} [scale=true] - True to align scale.
-* @param {boolean} [opacity=false] - True to align opcacity.
-*/
+	* Aligns the layers' transformations (position, rotation, scale) to another layer
+	* @param {Layer[]|LayerCollection} layers - The layers to align.
+	* @param {Layer} target - The reference layer.
+	* @param {boolean} [position=true] - True to align position.
+	* @param {boolean} [rotation=true] - True to align orientation.
+	* @param {boolean} [scale=true] - True to align scale.
+	* @param {boolean} [opacity=false] - True to align opcacity.
+	*/
 DuAEF.DuAE.Layer.align = function (layers, target, position, rotation, scale, opacity)
 {
 	if (typeof position === 'undefined') position = true;
@@ -1086,11 +1086,11 @@ DuAEF.DuAE.Layer.align = function (layers, target, position, rotation, scale, op
 }
 
 /**
-* Gets the transformation matrix of the layer from the compostion.<br />
-* Use Matrix.applyToPoint(point) to transform any coordinate with the matrix returned by this method.
-* @param {Layer[]} layer - the layer
-* @return {Matrix} The coordinates.
-*/
+	* Gets the transformation matrix of the layer from the compostion.<br />
+	* Use Matrix.applyToPoint(point) to transform any coordinate with the matrix returned by this method.
+	* @param {Layer[]} layer - the layer
+	* @return {Matrix} The coordinates.
+	*/
 DuAEF.DuAE.Layer.getTransformMatrix = function(layer)
 {
 	var matrix = new Matrix();
@@ -1169,4 +1169,26 @@ DuAEF.DuAE.Layer.moveLayerToProperty = function(layer, prop)
 		layer.position.setValue(prop.value);
 		layer.parent = parent;
 	}
+}
+
+/**
+ * Gets all the colors found on a layer
+ * @param {AVLayer} layer - The layer
+ * @return {Array[]} An array of colors in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ */
+DuAEF.DuAE.Layer.getColors = function(layer)
+{
+
+}
+
+/**
+ * Replaces a color in the layer
+ * @param {AVLayer} layer - The layer
+ * @param {float[]} old - The color to replace, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @param {float[]} new - The new color, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @return {int} The number of colors replaced
+ */
+DuAEF.DuAE.Comp.replaceColor = function(layer, old, new)
+{
+
 }

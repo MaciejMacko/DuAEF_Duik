@@ -129,3 +129,25 @@ DuAEF.DuAE.Project.setUniqueCompNames = function()
 		comp.name = DuAEF.DuAE.Project.newUniqueCompName(newName);
 	});
 }
+
+/**
+ * Gets all the colors found in the project
+ * @param {boolean} [selectedOnly=false] - true to search only in selected compositions.
+ * @return {Array[]} An array of colors in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ */
+DuAEF.DuAE.Project.getColors = function(selectedOnly)
+{
+	if (typeof selectedOnly === 'undefined') selectedOnly = false;
+}
+
+/**
+ * Replaces a color in the project
+ * @param {float[]} old - The color to replace, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @param {float[]} new - The new color, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @param {boolean} [selectedOnly=false] - true to search only in selected compositions.
+ * @return {int} The number of colors replaced
+ */
+DuAEF.DuAE.Project.replaceColor = function(old, new , selectedOnly)
+{
+	if (typeof selectedOnly === 'undefined') selectedOnly = false;
+}

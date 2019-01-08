@@ -360,3 +360,31 @@ DuAEF.DuAE.Comp.getAudioLayers = function (comp,audioActiveOnly)
 
 	return audioLayers;
 }
+
+/**
+ * Gets all the colors found in a composition
+ * @param {CompItem} [comp=Active composition] - The composition.
+ * @param {boolean} [inPreComps=false] - true to search in precomps too.
+ * @return {Array[]} An array of colors in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ */
+DuAEF.DuAE.Comp.getColors = function(comp, inPreComps)
+{
+	if (typeof inPreComps === 'undefined') inPreComps = false;
+	if (typeof comp === 'undefined') comp = DuAEF.DuAE.Project.getActiveComp();
+	if (!comp) return [];
+}
+
+/**
+ * Replaces a color in the composition
+ * @param {float[]} old - The color to replace, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @param {float[]} new - The new color, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @param {CompItem} [comp=Active composition] - The composition
+ * @param {boolean} [inPreComps=false] - true to search in precomps too.
+ * @return {int} The number of colors replaced
+ */
+DuAEF.DuAE.Comp.replaceColor = function(old, new , comp, inPreComps)
+{
+	if (typeof inPreComps === 'undefined') inPreComps = false;
+	if (typeof comp === 'undefined') comp = DuAEF.DuAE.Project.getActiveComp();
+	if (!comp) return 0;
+}
