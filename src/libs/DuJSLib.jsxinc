@@ -275,7 +275,7 @@ DuAEF.DuJS.Array.indexOf = function (arr,value,comparisonFunction)
 	for (var i = 0;i<arr.length;i++)
 	{
 		if (!useFunction && arr[i] == value) return i;
-		if (useFunction && comparisonFunction(arr[i],value)) return i;
+		else if (useFunction && comparisonFunction(arr[i],value)) return i;
 	}
 	return -1;
 }
@@ -286,11 +286,13 @@ DuAEF.DuJS.Array.indexOf = function (arr,value,comparisonFunction)
 	* @param {Array}	arr	- The array
 	* @return {boolean}	true if the array has duplicate values
 */
-DuAEF.DuJS.Array.hasDuplicates = function (arr)
+DuAEF.DuJS.Array.hasDuplicates = function (arr,comparisonFunction)
 {
+	var useFunction = typeof comparisonFunction === 'function';
 	for (var i = 0;i<arr.length-1;i++) {
 		for (var j=i+1;j<arr.length;j++) {
-			if (arr[i] === arr[j]) return true;
+			if (!useFunction && arr[i] === arr[j]) return true;
+			else if (useFunction && comparisonFunction(arr[i],arr[j])) return true;
 		}
 	}
 	return false;
@@ -302,13 +304,15 @@ DuAEF.DuJS.Array.hasDuplicates = function (arr)
 	* @param {Array}	arr	- The array
 	* @return {Array}	The duplicated values
 */
-DuAEF.DuJS.Array.getDuplicates = function (arr)
+DuAEF.DuJS.Array.getDuplicates = function (arr,comparisonFunction)
 {
+	var useFunction = typeof comparisonFunction === 'function';
 	var duplicates = [];
 	for (var i = 0;i<arr.length-1;i++) {
-	for (var j=i+1;j<arr.length;j++) {
-	if (arr[i] === arr[j]) duplicates.push(arr[j]);
-	}
+		for (var j=i+1;j<arr.length;j++) {
+			if (!useFunction && arr[i] === arr[j]) duplicates.push(arr[j]);
+			else if (useFunction && comparisonFunction(arr[i],arr[j])) duplicates.push(arr[j]);
+		}
 	}
 	DuAEF.DuJS.Array.removeDuplicates(duplicates);
 	return duplicates;
@@ -320,14 +324,16 @@ DuAEF.DuJS.Array.getDuplicates = function (arr)
 	* @param {Array}	arr	- The array
 	* @return {Array}	The duplicated (and removed) values
 */
-DuAEF.DuJS.Array.removeDuplicates = function (arr)
+DuAEF.DuJS.Array.removeDuplicates = function (arr,comparisonFunction)
 {
+	var useFunction = typeof comparisonFunction === 'function';
 	var removed = [];
-	for (var i = 0;i<arr.length-1;i++)
+	for (var i = 0, num = arr.length-1; i<num; i++)
 	{
-        for (var j=i+1;j<arr.length;j++)
+        for (var j= arr.length ; j > i; j--)
 		{
-            if (arr[i] === arr[j]) removed = removed.concat(arr.splice(j,1));
+			if (!useFunction && arr[i] === arr[j]) removed = removed.concat(arr.splice(j,1));
+			else if (useFunction && comparisonFunction(arr[i],arr[j])) removed = removed.concat(arr.splice(j,1));
         }
 	}
 	return removed;
@@ -808,28 +814,6 @@ DuAEF.DuJS.Math.toDegrees = function (value)
 }
 
 /**
-	* Converts the number from degrees to radians
-	* @memberof DuAEF.DuJS.Math
-	* @param {number} value - the value
-	* @return {float} The value in radians
-*/
-DuAEF.DuJS.Math.toRadians = function (value)
-{
-	return value * Math.PI / 180;
-}
-
-/**
-	* Converts the number from radians to degrees
-	* @memberof DuAEF.DuJS.Math
-	* @param {number} value - the value
-	* @return {float} The value in degrees
-*/
-DuAEF.DuJS.Math.toDegrees = function (value)
-{
-	return value * 180 / Math.PI;
-}
-
-/**
 	* JavaScript Regular Expression related methods
 	* @namespace
 	* @memberof DuAEF.DuJS
@@ -1246,6 +1230,53 @@ DuAEF.DuJS.Color.rgbToHsl = function (color)
     }
 
     return [h, s, l, color[3]];
+}
+
+/**
+	* Compares two colors.
+	* @memberof DuAEF.DuJS.Array
+	* @param {float[]} color1 - The first color [R,V,B(,A)]
+	* @param {float[]} color2 - The second color [R,V,B(,A)]
+	* @param {boolean} [ignoreAlpha=true] - true to not compare alpha
+	* @param {int} [floatPrecision=6] - The precision for (float) number comparison, number of decimals. Set to -1 to not use.
+	* @return {boolean|null} true if the two colors are the same
+*/
+DuAEF.DuJS.Color.compare = function (color1, color2, ignoreAlpha, precision)
+{
+	if (!(color1 instanceof Array)) return false;
+	if (!(color2 instanceof Array)) return false;
+	if (color1.length < 3 && color1.length > 4) return false;
+	if (color2.length < 3 && color2.length > 4) return false;
+
+	if (typeof ignoreAlpha === 'undefined') ignoreAlpha = true;
+	if (typeof precision === 'undefined') precision = 6;
+	
+	if (ignoreAlpha)
+	{
+		if (color1.length == 4) color1.pop();
+		if (color2.length == 4) color2.pop();
+	}
+	else
+	{
+		if (color1.length == 3) color1.push(1);
+		if (color2.length == 3) color2.push(1);
+	}
+
+	if (color1.length != color2.length) return false;
+
+	var it = new Iterator(color1);
+	var ok = true;
+	it.do(function (item1)
+	{
+		var item2 = color2[it.current];
+		if (!DuAEF.DuJS.Array.compare(item1,item2,precision))
+		{
+			ok = false;
+			return;
+		}
+	});
+
+	return ok;
 }
 
 /**
