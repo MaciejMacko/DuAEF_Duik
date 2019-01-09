@@ -1,0 +1,42 @@
+var shared = {};
+
+shared.checkForUpdate = function (showAlert)
+{
+	if (!DuAEF.DuAE.App.hasFilesAndNetworkAccess) return null;
+    if (typeof updateServer === 'undefined') return null;
+    if (typeof updateFeed === 'undefined') return null;
+    if (typeof downloadURL === 'undefined') downloadURL = "";
+    if (updateServer == '') return null;
+    if (updateFeed == '') return null;
+
+	if (typeof showAlert === 'undefined') showAlert = false;
+
+	//get the RSS feed
+	var channel = DuAEF.DuRSS.get(updateServer, updateFeed, scriptName.toUpperCase() + '/' + version);
+
+	if (!channel && showAlert)
+	{
+		alert("The server could not be contacted.");
+		return channel;
+	}
+
+	if (showAlert && channel.items.length > 0)
+	{
+		var newVersion = channel.items[0].title;
+		//if the new version is higher
+		if (DuAEF.DuJS.Version.compare(newVersion, version))
+		{
+            var alertStr = "A new version of " + scriptName + " is available";
+            if ( downloadURL != "" ) alertStr += ",\ngo to " + downloadURL + " to download it";
+            alertStr += ".\n\nCurrent version: " + version + "\nNew version: " + newVersion;
+			alert(alertStr);
+			DuAEF.DuSystem.openURL(channel.items[0].link);
+		}
+		else
+		{
+			alert("This version is up-to-date");
+		}
+	}
+
+	return channel;
+}

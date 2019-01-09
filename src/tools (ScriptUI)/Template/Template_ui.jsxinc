@@ -1,0 +1,24 @@
+function createUI()
+{
+    var ui_palette = ui_mainPalette.contents.add('group');
+	ui_palette.alignment = ['fill','fill'];
+	ui_palette.orientation = 'column';
+	ui_palette.spacing = 2;
+	ui_palette.margins = 0;
+
+
+
+
+    //the bottom line
+	var ui_bottomGroup = DuAEF.DuScriptUI.addGroup(ui_palette);
+	ui_bottomGroup.alignment = ['fill','bottom'];
+	ui_rainboxURL = DuAEF.DuScriptUI.addStaticText(ui_bottomGroup,'v' + version + ' | rainboxprod.coop',undefined,undefined,false);
+	ui_rainboxURL.alignment = ['left','bottom'];
+	if (settings.data.debug)
+	{
+		var refreshButton = ui_bottomGroup.add('button',undefined,'R');
+		refreshButton.alignment = ['right','bottom'];
+		refreshButton.maximumSize = [20, 20];
+		refreshButton.onClick = function () { ui_palette.refreshUI( thisScriptFile ); };
+	}
+}

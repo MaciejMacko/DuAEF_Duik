@@ -1,31 +1,53 @@
 /*
-This is a Script/ScriptUI Template using the Duduf After Effects Framework (DuAEF).
-The script can be launched both from ScriptUI Panels or the File/Scripts/Run Script... menu.
+	DuColor
+
+	Copyright (c) 2019 Nicolas Dufresne, Rainbox Productions
+
+	https://rainboxprod.coop
+
+	This file is part of DuColor.
+
+		DuColor is free software: you can redistribute it and/or modify
+		it under the terms of the GNU General Public License as published by
+		the Free Software Foundation, either version 3 of the License, or
+		(at your option) any later version.
+
+		DuColor is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with DuColor. If not, see <http://www.gnu.org/licenses/>.
+
 */
 
-//encapsulate the script in a function to avoid global variables
-(function (thisObj) {
-
-	//================
+(function(obj)
+{
+	//=========================
 	var version = '0.0.0';
-	var scriptName = "The Script Name";
-	//================
+    var scriptName = "Template";
+    var updateServer = 'rainboxprod.net';
+    var updateFeed = 'wp/category/updates/feed/';
+    var downloadURL = "http://rainboxprod.coop";
+	//=========================
+
 	#include DuAEF.jsxinc
+    #include Template_shared.jsxinc
 
-	// ================ FUNCTIONS =============
-	//MAIN
+	//============= INIT ==============
 
+	//UI
+	//main palette
+	var ui_mainPalette = DuAEF.DuScriptUI.createUI(obj,scriptName, ['fill','fill']);
+	ui_mainPalette.contents.orientation = 'column';
 
-	//UI EVENTS
+	//this file
+	var thisScriptFile = new File($.fileName);
 
+    #include Template_init.jsxinc
+	#include Template_ui.jsxinc
 
-	// _______ UI SETUP _______
-	var ui = DuAEF.DuScriptUI.createUI(thisObj,scriptName);
-
-	// ============ UI CONTENT =================
-
-
-	//Show UI
-	DuAEF.DuScriptUI.showUI(ui);
+	DuAEF.DuScriptUI.showUI(ui_mainPalette);
 
 })(this);
