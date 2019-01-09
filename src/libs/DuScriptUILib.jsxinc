@@ -184,6 +184,7 @@ DuAEF.DuScriptUI.setBackgroundColor = function (uiItem,color,adjusted)
 	if (!uiItem) throw "You must provide a ScriptUI Control to change the color of the background";
 	var c = color;
 	if (adjusted) c = DuAEF.DuScriptUI.adjustColor(color);
+	c = DuAEF.DuJS.Math.clamp(c);
 	var g = uiItem.graphics;
 	var brush = g.newBrush(g.BrushType.SOLID_COLOR,c);
 	g.backgroundColor = brush;
@@ -453,6 +454,7 @@ DuAEF.DuScriptUI.addSeparator = function (container,name,checkable,drawLine)
  */
 DuAEF.DuScriptUI.addButton = function (container,text,image,helpTip,imageOver)
 {
+	if (typeof noHover === 'undefined') noHover = false;
 	if (typeof text === 'undefined') text = '';
 	if (!image) image = '';
 	if (typeof helpTip === 'undefined') helpTip = '';
@@ -482,6 +484,7 @@ DuAEF.DuScriptUI.addButton = function (container,text,image,helpTip,imageOver)
 	imageButton.onCtrlClick = function(){};
 	imageButton.image = null;
 	imageButton.label = null;
+	imageButton.noHover = false;
 
 	//if not CS6, add fillers to be able to click anywhere on the button
 	if (DuAEF.DuAE.App.version > 11 && text != '')
@@ -552,7 +555,7 @@ DuAEF.DuScriptUI.addButton = function (container,text,image,helpTip,imageOver)
 		e.stopPropagation();
 		DuAEF.DuScriptUI.dimControls();
 		if (icon) if (imageButton.imageOver != '') icon.image = imageButton.imageOver;
-		if (label)
+		if (label && !imageButton.noHover)
 		{
 			DuAEF.DuScriptUI.setTextColor(imageButton.label,DuAEF.DuJS.Color.Colors.VERY_LIGHT_GREY);
 			DuAEF.DuScriptUI.setBackgroundColor(imageButton.group,DuAEF.DuJS.Color.Colors.DARK_GREY);
@@ -563,7 +566,7 @@ DuAEF.DuScriptUI.addButton = function (container,text,image,helpTip,imageOver)
 	imageButton.dim = function ()
 	{
 		if (icon) if (imageButton.standardImage != '') icon.image = imageButton.standardImage;
-		if (label)
+		if (label && !imageButton.noHover)
 		{
 			DuAEF.DuScriptUI.setTextColor(imageButton.label,DuAEF.DuJS.Color.Colors.LIGHT_GREY);
 			DuAEF.DuScriptUI.setBackgroundColor(imageButton.group,DuAEF.DuJS.Color.Colors.VERY_DARK_GREY);
