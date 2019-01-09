@@ -1,0 +1,15 @@
+
+//Load settings and set defaults here
+
+if (typeof settings.data.version === 'undefined') settings.data.version = version;
+//if the version has changed, update some settings here
+if (version != settings.data.version)
+{
+
+}
+
+settings.data.duikVersion = version;
+
+//load settings
+if (typeof settings.data.checkUpdatesAtStartup === 'undefined') settings.data.checkUpdatesAtStartup = true;
+if (typeof settings.data.updateCheckDate === 'undefined') settings.data.updateCheckDate = true;

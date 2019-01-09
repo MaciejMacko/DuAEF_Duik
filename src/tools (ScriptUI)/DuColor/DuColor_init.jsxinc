@@ -1,0 +1,137 @@
+//=========== GLOBAL VARIABLES =============
+var settingsFile, settings;
+
+//=========== FILE AND NETWORK ACCESS ===========
+
+if (!DuAEF.DuAE.App.hasFilesAndNetworkAccess)
+{
+	var ui_accessFileAndNetworkGroup = DuAEF.DuScriptUI.addGroup(ui_mainPalette.contents,'column');
+
+	var accessExplanation = scriptName + " needs to be allowed to write files in order to:\n\n" +
+		"- Display icons\n" +
+		"- Save your settings.\n\n" +
+		"It also needs network access to check for updates.\n\n" +
+		"Please, check the box called 'Allow Scripts to write files...' in the preferences of After Effects.";
+
+	ui_accessFileAndNetworkGroup.add('statictext',undefined,accessExplanation,{multiline:true});
+	var ui_fileAndNetworkPrefButton = ui_accessFileAndNetworkGroup.add('button',undefined,'Open preferences');
+	var ui_fileAndNetworkIgnoreButton = ui_accessFileAndNetworkGroup.add('button',undefined,'Ignore');
+
+	ui_fileAndNetworkPrefButton.onClick = function ()
+	{
+		var ok = DuAEF.DuAE.App.askFilesAndNetworkAccess(false);
+		if (ok)
+		{
+			ui_accessFileAndNetworkGroup.visible = false;
+			loadSettings();
+		}
+	}
+
+	ui_fileAndNetworkIgnoreButton.onClick = function ()
+	{
+		ui_accessFileAndNetworkGroup.visible = false;
+		loadSettings();
+	}
+
+	DuAEF.DuScriptUI.showUI(ui_mainPalette);
+}
+else
+{
+	loadSettings();
+}
+
+//=========== SETTINGS ===========
+function loadSettings ()
+{
+	if (app.settings.haveSetting(scriptName,"settingsFile")) settingsFile = new File(app.settings.getSetting(scriptName,"settingsFile"));
+	settings = new DuSettings(scriptName,settingsFile);
+
+    #include DuColor_settings.jsxinc
+
+    settings.save();
+
+
+	checkUpdates();
+}
+
+//================== UPDATES ===================
+
+function checkUpdates()
+{
+	if (DuAEF.debug || !settings.data.checkUpdatesAtStartup)
+	{
+		createUI();
+		return;
+	}
+
+	//check only if it has not been checked today
+	var lastCheck = settings.data.updateCheckDate;
+	var now = new Date().getTime();
+	//if we've checked in the last 24 hours
+	if(now - lastCheck < 24*60*60*1000)
+	{
+		createUI();
+		return;
+	}
+
+	var channel = shared.checkForUpdate(false);
+	if (!channel)
+	{
+		createUI();
+		return;
+	}
+
+	if (channel.items.length == 0)
+	{
+		createUI();
+		return;
+	}
+
+	//set the checked date
+	settings.data.updateCheckDate = new Date().getTime();
+	settings.save();
+
+	var item = channel.items[0];
+	var newVersion = item.title;
+
+	//if current version is higher than the new version on the server
+	if (DuAEF.DuJS.Version.compare(version, newVersion))
+	{
+		createUI();
+		return;
+	}
+
+	var ui_newVersionGroup = DuAEF.DuScriptUI.addGroup(ui_mainPalette.contents,'column');
+	ui_newVersionGroup.alignment = ['fill','fill'];
+	ui_newVersionGroup.alignChildren = ['fill','top'];
+	DuAEF.DuScriptUI.addSeparator(ui_newVersionGroup, "A new version of " + scriptName + " is available!");
+
+	//TODO use duscriptui controls
+	ui_newVersionGroup.add('statictext',undefined,"Current version: " + version + "\nNew version: " + newVersion, {multiline:true});
+	ui_newVersionGroup.add('statictext',undefined,item.pubDate.toString());
+	var ui_newVersionDescription = ui_newVersionGroup.add('edittext',undefined,item.description, {multiline:true});
+	ui_newVersionDescription.alignment = ['fill','fill'];
+
+	var ui_newVersionOpenButton = ui_newVersionGroup.add('button',undefined,'More info');
+	ui_newVersionOpenButton.alignment = ['fill','bottom'];
+	//var ui_newVersionUpdateButton = ui_newVersionGroup.add('button',undefined,'Update now!');
+	//ui_newVersionUpdateButton.alignment = ['fill','bottom'];
+	var ui_newVersionIgnoreButton = ui_newVersionGroup.add('button',undefined,'Ignore');
+	ui_newVersionIgnoreButton.alignment = ['fill','bottom'];
+
+	ui_newVersionOpenButton.onClick = function ()
+	{
+		DuAEF.DuSystem.openURL(item.link);
+		ui_newVersionGroup.visible = false;
+		createUI();
+	}
+
+	ui_newVersionIgnoreButton.onClick = function ()
+	{
+		ui_newVersionGroup.visible = false;
+		createUI();
+	}
+
+	DuAEF.DuScriptUI.showUI(ui_mainPalette);
+
+}

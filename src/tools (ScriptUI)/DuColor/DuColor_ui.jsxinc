@@ -1,0 +1,132 @@
+function createUI()
+{
+    var currentColors = [];
+
+    // ======= FUNCTIONS
+
+    function refresh()
+    {
+        currentColors = [];
+
+        //remove previous buttons
+        for ( var i = ui_colorsGroup.children.length - 1; i >= 0; i-- )
+        {
+            ui_colorsGroup.remove( ui_colorsGroup.children[ i ] );
+        }
+
+        if (ui_selector.index == 0)
+        {
+            var selectedLayers = ui_layersSelector.index == 0;
+            var inPrecomps = ui_layersSelector.index == 2;
+            currentColors = DuAEF.DuAE.Comp.getColors(undefined, selectedLayers, inPrecomps);
+        }
+        else if (ui_selector.index == 1)
+        {
+            currentColors = DuAEF.DuAE.Project.getColors(true);
+        }
+        else
+        {
+            currentColors = DuAEF.DuAE.Project.getColors(false);
+        }
+
+        //remove duplicates
+        DuAEF.DuJS.Array.removeDuplicates(currentColors,DuAEF.DuJS.Color.compare);
+
+        //add buttons
+        for (var i = 0, num = currentColors.length; i < num; i++)
+        {
+            var c = currentColors[i];
+            var h = "#" + DuAEF.DuJS.Color.rgbToHex(c) + "\n";
+            //adjust to bpc
+            var r,g,b;
+            if (app.project.bitsPerChannel == 8)
+            {
+                r = Math.round(c[0]*256);
+                g = Math.round(c[1]*256);
+                b = Math.round(c[2]*256);
+            }
+            else if (app.project.bitsPerChannel == 16)
+            {
+                r = Math.round(c[0]*65536);
+                g = Math.round(c[1]*65536);
+                b = Math.round(c[2]*65536);
+            }
+            else
+            {
+                r = c[0]*65536;
+                g = c[1]*65536;
+                b = c[2]*65536;
+            }
+            h += "R: " + r + "\n";
+            h += "G: " + g + "\n";
+            h += "B: " + b ;
+
+            var b = DuAEF.DuScriptUI.addButton(ui_colorsGroup, " ", undefined, h);
+            b.label.characters = 2;
+            b.noHover = true;
+            b.alignment = ['fill','fill'];
+            DuAEF.DuScriptUI.setBackgroundColor(b, c, false);
+
+        }
+
+        //refresh ui
+        ui_mainPalette.layout.layout(true);
+        ui_mainPalette.layout.resize();
+    }
+
+    // ========= UI
+
+    var ui_palette = ui_mainPalette.contents.add('group');
+	ui_palette.alignment = ['fill','fill'];
+	ui_palette.orientation = 'column';
+	ui_palette.spacing = 2;
+	ui_palette.margins = 0;
+
+    var ui_topRow = DuAEF.DuScriptUI.addGroup(ui_palette);
+    ui_topRow.alignment = ['fill','top'];
+    var ui_selector = DuAEF.DuScriptUI.addSelector(ui_topRow);
+    ui_selector.alignment = ['left','fill'];
+    ui_selector.addButton("Current composition");
+    ui_selector.addButton("Selected compositions");
+    ui_selector.addButton("Project");
+    var ui_layersSelector = DuAEF.DuScriptUI.addSelector(ui_topRow);
+    ui_layersSelector.alignment = ['left','fill'];
+    ui_layersSelector.addButton("Selected layers");
+    ui_layersSelector.addButton("All layers");
+    ui_layersSelector.addButton("All layers and precomp.");
+    var ui_settingsButton = DuAEF.DuScriptUI.addButton(ui_topRow, "S");
+    ui_settingsButton.alignment = ['right','fill'];
+
+    var ui_mainRow = DuAEF.DuScriptUI.addGroup(ui_palette);
+    ui_mainRow.alignment = ['fill','fill'];
+
+    var ui_colorsGroup = DuAEF.DuScriptUI.addGroup(ui_mainRow, "row");
+    ui_colorsGroup.alignChildren = ['fill','fill'];
+    ui_colorsGroup.alignment = ['fill','fill'];
+
+    var ui_refreshButton = DuAEF.DuScriptUI.addButton(ui_mainRow, "R");
+    ui_refreshButton.alignment = ['right','fill'];
+
+    // ========== INIT
+    ui_selector.setCurrentIndex(0);
+    ui_layersSelector.setCurrentIndex(1);
+    refresh();
+
+    // ========== CONNEXIONS
+    ui_selector.onChange = refresh;
+    ui_layersSelector.onChange = refresh;
+    ui_refreshButton.onCLick = refresh;
+
+    //the bottom line
+	var ui_bottomGroup = DuAEF.DuScriptUI.addGroup(ui_palette);
+	ui_bottomGroup.alignment = ['fill','bottom'];
+	ui_rainboxURL = DuAEF.DuScriptUI.addStaticText(ui_bottomGroup,'v' + version + ' | rainboxprod.coop',undefined,undefined,false);
+	ui_rainboxURL.alignment = ['left','bottom'];
+	if (settings.data.debug)
+	{
+		var refreshButton = ui_bottomGroup.add('button',undefined,'R');
+		refreshButton.alignment = ['right','bottom'];
+		refreshButton.maximumSize = [20, 20];
+		refreshButton.onClick = function () { ui_palette.refreshUI( thisScriptFile ); };
+	}
+}
