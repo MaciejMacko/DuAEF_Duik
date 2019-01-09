@@ -6,6 +6,33 @@
 DuAEF.DuAE.Comp = {};
 
 /**
+ * Recursively runs a function on a composition and its precompositions
+ * @param {CompItem} comp - The composition
+ * @param {function} callBack - The function to run on each composition, which takes a CompItem as its only parameter
+ */
+DuAEF.DuAE.Comp.do = function( comp, callBack, alreadyScanned )
+{
+	if (typeof alreadyScanned === 'undefined') alreadyScanned = [];
+	if (DuAEF.DuJS.Array.indexOf( alreadyScanned, comp.id ) >= 0) return;
+	
+	callBack(comp);
+
+	alreadyScanned.push(comp.id);
+
+	for (var i = 1, num = comp.numLayers; i <= num; i++)
+	{
+		var layer = comp.layer(i);
+		if (layer.source)
+		{
+			if (layer.source instanceof CompItem)
+			{
+				DuAEF.DuAE.Comp.do(layer, callBack, alreadyScanned);
+			}
+		}
+	}
+}
+
+/**
  * Makes sure the composition has a unique name, renaming it if needed.
  * @param {CompItem} comp - The composition
  * @return {string} The new name.
@@ -364,27 +391,75 @@ DuAEF.DuAE.Comp.getAudioLayers = function (comp,audioActiveOnly)
 /**
  * Gets all the colors found in a composition
  * @param {CompItem} [comp=Active composition] - The composition.
- * @param {boolean} [inPreComps=false] - true to search in precomps too.
+ * @param {boolean} [selectedLayers=false] - true to search only in selected layers.
+ * @param {boolean} [inPreComps=true] - true to search in precomps too.
  * @return {Array[]} An array of colors in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
  */
-DuAEF.DuAE.Comp.getColors = function(comp, inPreComps)
+DuAEF.DuAE.Comp.getColors = function(comp, selectedLayers, inPreComps, alreadyScanned)
 {
-	if (typeof inPreComps === 'undefined') inPreComps = false;
+	if (typeof inPreComps === 'undefined') inPreComps = true;
+	if (typeof selectedLayers === 'undefined') selectedLayers = false;
+	if (typeof alreadyScanned === 'undefined') alreadyScanned = [];
 	if (typeof comp === 'undefined') comp = DuAEF.DuAE.Project.getActiveComp();
 	if (!comp) return [];
+	if (DuAEF.DuJS.Array.indexOf( alreadyScanned, comp.id ) >= 0) return [];
+
+	var colors = [];
+
+	var layers = [];
+	if (selectedLayers) layers = comp.selectedLayers;
+	else layers = comp.layers;
+
+	new Iterator(layers).do(function(layer)
+	{
+		colors = colors.concat( DuAEF.DuAE.Layer.getColors( layer ) );
+		if (inPreComps)
+		{
+			var sourceComp = layer.source;
+			if (sourceComp instanceof CompItem)
+			{
+				colors = colors.concat( DuAEF.DuAE.Comp.getColors(sourceComp, false, true, alreadyScanned ) );
+				alreadyScanned.push(sourceComp.id);
+			}
+		}
+	});
+
+	return colors;
 }
 
 /**
  * Replaces a color in the composition
- * @param {float[]} old - The color to replace, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
- * @param {float[]} new - The new color, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @param {float[]} oldColor - The color to replace, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @param {float[]} newColor - The new color, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
  * @param {CompItem} [comp=Active composition] - The composition
+ * @param {boolean} [selectedLayers=false] - true to search only in selected layers.
  * @param {boolean} [inPreComps=false] - true to search in precomps too.
  * @return {int} The number of colors replaced
  */
-DuAEF.DuAE.Comp.replaceColor = function(old, new , comp, inPreComps)
+DuAEF.DuAE.Comp.replaceColor = function(oldColor, newColor , comp, selectedLayers, inPreComps, alreadyScanned)
 {
 	if (typeof inPreComps === 'undefined') inPreComps = false;
+	if (typeof selectedLayers === 'undefined') selectedLayers = false;
+	if (typeof alreadyScanned === 'undefined') alreadyScanned = [];
 	if (typeof comp === 'undefined') comp = DuAEF.DuAE.Project.getActiveComp();
-	if (!comp) return 0;
+	if (!comp) return [];
+	if (DuAEF.DuJS.Array.indexOf( alreadyScanned, comp.id ) >= 0) return;
+
+	var layers = [];
+	if (selectedLayers) layers = comp.selectedLayers;
+	else layers = comp.layers;
+
+	new Iterator(layers).do(function(layer)
+	{
+		DuAEF.DuAE.Layer.replaceColor(layer, oldColor, newColor);
+		if (inPreComps)
+		{
+			var sourceComp = layer.source;
+			if (sourceComp instanceof CompItem)
+			{
+				DuAEF.DuAE.Comp.replaceColor(oldColor, newColor, sourceComp, false, true, alreadyScanned);
+				alreadyScanned.push(sourceComp.id);
+			}
+		}
+	});
 }

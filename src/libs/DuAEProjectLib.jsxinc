@@ -138,16 +138,47 @@ DuAEF.DuAE.Project.setUniqueCompNames = function()
 DuAEF.DuAE.Project.getColors = function(selectedOnly)
 {
 	if (typeof selectedOnly === 'undefined') selectedOnly = false;
+	var comps = [];
+	if (selectedOnly) comps = app.project.selection;
+	else comps = app.project.items;
+
+	var colors  = [];
+
+	new Iterator(comps).do(function (comp)
+	{
+		if (comp instanceof CompItem)
+		{
+			colors = colors.concat( DuAEF.DuAE.Comp.getColors(comp, false, false));
+		}
+	});
+
+	return colors;
 }
 
 /**
  * Replaces a color in the project
- * @param {float[]} old - The color to replace, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
- * @param {float[]} new - The new color, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @param {float[]} oldColor - The color to replace, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @param {float[]} newColor - The new color, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
  * @param {boolean} [selectedOnly=false] - true to search only in selected compositions.
  * @return {int} The number of colors replaced
  */
-DuAEF.DuAE.Project.replaceColor = function(old, new , selectedOnly)
+DuAEF.DuAE.Project.replaceColor = function(oldColor , newColor , selectedOnly)
 {
 	if (typeof selectedOnly === 'undefined') selectedOnly = false;
+
+	var comps = [];
+	if (selectedOnly) comps = app.project.selectedItems;
+	else comps = app.project.items;
+
+	var colors  = [];
+
+	new Iterator(comps).do(function (comp)
+	{
+		if (comp instanceof CompItem)
+		{
+			DuAEF.DuAE.Comp.replaceColor(oldColor, newColor , comp, false, false);
+		}
+	});
+
+	return colors;
 }

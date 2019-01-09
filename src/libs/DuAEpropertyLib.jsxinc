@@ -6,6 +6,27 @@
 DuAEF.DuAE.Property = {};
 
 /**
+ * Recursively runs a function on all the properties inside a property group
+ * @param {PropertyBase|Layer} prop - The group (can be a layer)
+ * @param {function} callBack - The function to run on each property, which takes a Property as its only parameter
+ */
+DuAEF.DuAE.Property.do = function( prop, callBack )
+{
+	for (var i = 1, num = prop.numProperties; i <= num; i++)
+	{
+		var subProp = prop.property(i);
+		if (subProp.propertyType == PropertyType.PROPERTY)
+		{
+			callBack(subProp);
+		}
+		else
+		{
+			DuAEF.DuAE.Property.do( subProp, callBack );
+		}
+	}
+}
+
+/**
 	* Gets the After Effects properties in the property
 	* @param {PropertyBase|PropertyInfo}	property	- The layer
 	* @param {PropertyType|PropertyValueType|string|function}	 [filter]	- A filter to get only a certain type, or value type, or property name or matchName.<br />
@@ -1941,6 +1962,59 @@ DuAEF.DuAE.Property.scriptifyExpression = function(prop)
 	expString += '\t\'' + expArray[expArray.length-1] + '\';';
 
 	return expString;
+}
+
+/**
+ * Recursively gets all the colors found in a property group
+ * @param {PropertyBase} prop - The property
+ * @return {Array[]} An array of colors in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ */
+DuAEF.DuAE.Property.getColors = function(prop)
+{
+	var colors = [];
+
+	DuAEF.DuAE.Property.do( prop, function (subProp)
+	{
+		if (subProp.propertyType == PropertyType.PROPERTY)
+		{
+			if (DuAEF.DuAE.Property.getDimensions(subProp) == 4)
+			{
+				if ( DuAEF.DuAE.Property.isEditable(subProp) ) colors.push(subProp.value);
+			}
+		}
+	});
+
+	return colors;
+}
+
+/**
+ * Recursively replaces a color found in a property group
+ * @param {PropertyBase} prop - The property
+ * @param {float[]} oldColor - The color to replace, in the form [R,V,B(,A)] where the colors are float in the range 0.0 - 1.0
+ * @param {float[]} newColor - The new color, in the form [R,V,B(,A)] where the colors are float in the range 0.0 - 1.0
+ */
+DuAEF.DuAE.Property.replaceColor = function(prop, oldColor, newColor)
+{
+	DuAEF.DuAE.Property.do( prop, function(subProp)
+	{
+		if (subProp.propertyType == PropertyType.PROPERTY)
+		{
+			if (DuAEF.DuAE.Property.getDimensions(subProp) == 4)
+			{
+				if ( DuAEF.DuAE.Property.isEditable(subProp) )
+				{
+					var oldValue = subProp.value;
+					oldValue.pop();
+					if (oldColor.length == 4) oldColor.pop();
+					if ( DuAEF.DuJS.Array.compare(oldValue, oldColor, 8) )
+					{
+						if (newColor.length == 3) newColor.push(1);
+						subProp.setValue(newColor);
+					}
+				}
+			}
+		}
+	});
 }
 
 /**

@@ -1172,23 +1172,85 @@ DuAEF.DuAE.Layer.moveLayerToProperty = function(layer, prop)
 }
 
 /**
+ * Gets the source color of a solid layer
+ * @param {AVLayer} layer - The layer
+ * @return {Array[]|null} An array of colors in the form [R,V,B] where the colors are float in the range 0.0 - 1.0<br />
+ * Returns null if the layer is not a solid.
+ */
+DuAEF.DuAE.Layer.getSolidColor = function(layer)
+{
+	if (layer.nullLayer) return null;
+	if (layer.source) source = layer.source.mainSource;
+	else return null;
+	if (!source) return null;
+
+	if (typeof source.color != 'undefined')
+	{
+		return source.color;
+	}
+
+	return null;
+}
+
+/**
+ * Sets the source color of a solid layer
+ * @param {AVLayer} layer - The layer
+ * @param {float[]} newColor - the new color in the form [R,V,B(,A)] where the colors are float in the range 0.0 - 1.0
+ */
+DuAEF.DuAE.Layer.setSolidColor = function(layer, newColor)
+{
+	if (layer.nullLayer) return;
+	if (layer.source) source = layer.source.mainSource;
+	else return;
+	if (!source) return;
+
+	if (typeof source.color != 'undefined')
+	{
+		if (newColor.length == 4) newColor.pop();
+		source.color = newColor;
+	}
+}
+
+/**
  * Gets all the colors found on a layer
  * @param {AVLayer} layer - The layer
- * @return {Array[]} An array of colors in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @return {Array[]} An array of colors in the form [R,V,B(,A)] where the colors are float in the range 0.0 - 1.0
  */
 DuAEF.DuAE.Layer.getColors = function(layer)
 {
+	var colors = [];
+	//styles and effects
+	if (layer instanceof AVLayer || layer instanceof TextLayer)
+	{
+		colors = colors.concat( DuAEF.DuAE.Property.getColors(layer.property("ADBE Layer Styles")) );
+		colors = colors.concat( DuAEF.DuAE.Property.getColors(layer.property("ADBE Effect Parade")) );
+	}
+	
+	//shapes
+	if (layer instanceof ShapeLayer) colors = colors.concat( DuAEF.DuAE.Property.getColors(layer.property("ADBE Root Vectors Group")) );
+	//light
+	if (layer instanceof LightLayer) colors = colors.concat( DuAEF.DuAE.Property.getColors(layer.property("ADBE Light Options Group")) );
+	//solid source
+	var solidColor = DuAEF.DuAE.Layer.getSolidColor(layer);
+	if (solidColor) colors.push(solidColor);
 
+	return colors;
 }
 
 /**
  * Replaces a color in the layer
  * @param {AVLayer} layer - The layer
- * @param {float[]} old - The color to replace, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
- * @param {float[]} new - The new color, in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @param {float[]} oldColor - The color to replace, in the form [R,V,B(,A)] where the colors are float in the range 0.0 - 1.0
+ * @param {float[]} newColor - The new color, in the form [R,V,B(,A)] where the colors are float in the range 0.0 - 1.0
  * @return {int} The number of colors replaced
  */
-DuAEF.DuAE.Comp.replaceColor = function(layer, old, new)
+DuAEF.DuAE.Layer.replaceColor = function(layer, oldColor, newColor)
 {
-
+	DuAEF.DuAE.Property.replaceColor(layer, oldColor, newColor);
+	var solidColor = DuAEF.DuAE.Layer.getSolidColor(layer);
+	if (solidColor)
+	{
+		if (oldColor.length == 4) oldColor.pop();
+		if (DuAEF.DuJS.Array.compare(solidColor, oldColor, 8))  DuAEF.DuAE.Layer.setSolidColor(layer, newColor);
+	}
 }
