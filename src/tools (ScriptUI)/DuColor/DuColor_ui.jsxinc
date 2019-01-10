@@ -1,11 +1,13 @@
 function createUI()
 {
     var currentColors = [];
+    var currentProperties = [];
 
     // ======= FUNCTIONS
 
     function refresh()
     {
+        currentProperties = [];
         currentColors = [];
 
         //remove previous buttons
@@ -18,16 +20,26 @@ function createUI()
         {
             var selectedLayers = ui_layersSelector.index == 0;
             var inPrecomps = ui_layersSelector.index == 2;
-            currentColors = DuAEF.DuAE.Comp.getColors(undefined, selectedLayers, inPrecomps);
+            currentProperties = DuAEF.DuAE.Comp.getColors(undefined, selectedLayers, inPrecomps);
         }
         else if (ui_selector.index == 1)
         {
-            currentColors = DuAEF.DuAE.Project.getColors(true);
+            currentProperties = DuAEF.DuAE.Project.getColors(true);
         }
         else
         {
-            currentColors = DuAEF.DuAE.Project.getColors(false);
+            currentProperties = DuAEF.DuAE.Project.getColors(false);
         }
+
+        //List all colors
+        new Iterator(currentProperties).do(function(prop)
+        {
+            var c;
+            if (prop.solidColor) c = prop.color;
+            else c = prop.getProperty().value;
+            currentColors.push(c);
+            prop.color = c;
+        });
 
         //remove duplicates
         DuAEF.DuJS.Array.removeDuplicates(currentColors,DuAEF.DuJS.Color.compare);
@@ -61,11 +73,13 @@ function createUI()
             h += "G: " + g + "\n";
             h += "B: " + b ;
 
-            var b = DuAEF.DuScriptUI.addButton(ui_colorsGroup, " ", undefined, h);
-            b.label.characters = 2;
-            b.noHover = true;
+            var g = DuAEF.DuScriptUI.addGroup(ui_colorsGroup);
+            var b = g.add('statictext', undefined, "#" + DuAEF.DuJS.Color.rgbToHex(c));
+            b.characters = 2;
+            b.helpTip = h;
+            g.alignment = ['fill','fill'];
             b.alignment = ['fill','fill'];
-            DuAEF.DuScriptUI.setBackgroundColor(b, c, false);
+            DuAEF.DuScriptUI.setBackgroundColor(g, c, false);
 
         }
 

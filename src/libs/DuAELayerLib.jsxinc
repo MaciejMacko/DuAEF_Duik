@@ -1214,7 +1214,8 @@ DuAEF.DuAE.Layer.setSolidColor = function(layer, newColor)
 /**
  * Gets all the colors found on a layer
  * @param {AVLayer} layer - The layer
- * @return {Array[]} An array of colors in the form [R,V,B(,A)] where the colors are float in the range 0.0 - 1.0
+ * @return {PropertyInfo[]} The color properties. One of these may have the attribute .solidColor set to true,<br />
+ * in this case it contains only the color value of the solid in the .color attribute
  */
 DuAEF.DuAE.Layer.getColors = function(layer)
 {
@@ -1232,7 +1233,11 @@ DuAEF.DuAE.Layer.getColors = function(layer)
 	if (layer instanceof LightLayer) colors = colors.concat( DuAEF.DuAE.Property.getColors(layer.property("ADBE Light Options Group")) );
 	//solid source
 	var solidColor = DuAEF.DuAE.Layer.getSolidColor(layer);
-	if (solidColor) colors.push(solidColor);
+	var p = {};
+	p.color = solidColor;
+	p.solidColor = true;
+	p.layer = layer;
+	if (solidColor) colors.push(p);
 
 	return colors;
 }

@@ -393,7 +393,7 @@ DuAEF.DuAE.Comp.getAudioLayers = function (comp,audioActiveOnly)
  * @param {CompItem} [comp=Active composition] - The composition.
  * @param {boolean} [selectedLayers=false] - true to search only in selected layers.
  * @param {boolean} [inPreComps=true] - true to search in precomps too.
- * @return {Array[]} An array of colors in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @return {PropertyInfo[]} The color properties
  */
 DuAEF.DuAE.Comp.getColors = function(comp, selectedLayers, inPreComps, alreadyScanned)
 {

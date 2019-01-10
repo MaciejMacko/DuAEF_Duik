@@ -1967,7 +1967,7 @@ DuAEF.DuAE.Property.scriptifyExpression = function(prop)
 /**
  * Recursively gets all the colors found in a property group
  * @param {PropertyBase} prop - The property
- * @return {Array[]} An array of colors in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @return {PropertyInfo[]} The color properties
  */
 DuAEF.DuAE.Property.getColors = function(prop)
 {
@@ -1979,7 +1979,7 @@ DuAEF.DuAE.Property.getColors = function(prop)
 		{
 			if (DuAEF.DuAE.Property.getDimensions(subProp) == 4)
 			{
-				if ( DuAEF.DuAE.Property.isEditable(subProp) ) colors.push(subProp.value);
+				if ( DuAEF.DuAE.Property.isEditable(subProp) ) colors.push(new PropertyInfo(subProp));
 			}
 		}
 	});

@@ -133,7 +133,7 @@ DuAEF.DuAE.Project.setUniqueCompNames = function()
 /**
  * Gets all the colors found in the project
  * @param {boolean} [selectedOnly=false] - true to search only in selected compositions.
- * @return {Array[]} An array of colors in the form [R,V,B,A] where the colors are float in the range 0.0 - 1.0
+ * @return {PropertyInfo[]} The color properties
  */
 DuAEF.DuAE.Project.getColors = function(selectedOnly)
 {
