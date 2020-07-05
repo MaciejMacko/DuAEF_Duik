@@ -415,6 +415,11 @@ function ui_buildAutomations(ui_automationsMainGroup)
         Duik.constraints.separateDimensions();
     }
 
+	function ui_interpolatorButton_clicked()
+	{
+		Duik.automation.interpolator();
+	}
+
 	//========== UI =============
 
 	ui_automationsMainGroup.orientation = 'stack';
@@ -468,7 +473,15 @@ function ui_buildAutomations(ui_automationsMainGroup)
 	var ui_walkOptionsButton = DuAEF.DuScriptUI.addButton(ui_walkGroup,'',DuAEF.DuBinary.toFile(w14_plus_m),"Walk cycle options",DuAEF.DuBinary.toFile(w14_plus_r));
 	ui_walkOptionsButton.group.alignment = [settings.data.uiMode > 2 ? 'left' : 'right','center'];
 
-	var ui_motionTrailGroup = DuAEF.DuScriptUI.addGroup(settings.data.uiMode > 2 ? ui_automationsLeftGroup : ui_automationsRightGroup);
+	var ui_interpolatorButton = DuAEF.DuScriptUI.addButton( 
+		settings.data.uiMode > 2 ? ui_automationsLeftGroup : ui_automationsRightGroup,
+		settings.data.uiMode > 2 ? '' : "Interpolator",
+		DuAEF.DuBinary.toFile(w25_interpolation_l),
+		"Control the interpolation of the selected properties from a single value",
+		DuAEF.DuBinary.toFile(w25_interpolation_r)
+		)
+
+	var ui_motionTrailGroup = DuAEF.DuScriptUI.addGroup(settings.data.uiMode > 2 ? ui_automationsFarRightGroup : ui_automationsRightGroup);
 	var ui_motionTrailButton = DuAEF.DuScriptUI.addButton(ui_motionTrailGroup,settings.data.uiMode > 2 ? '' : "Motion trail",DuAEF.DuBinary.toFile(w25_anim_l),"Add a motion trail for the selected layer(s).",DuAEF.DuBinary.toFile(w25_anim_r));
 	ui_motionTrailButton.setHelp("Motion Trail", motiontrailHelp, motiontrailLink);
 	var ui_motionTrailOptionsButton = DuAEF.DuScriptUI.addButton(ui_motionTrailGroup,'',DuAEF.DuBinary.toFile(w14_plus_m),"Kleaner options",DuAEF.DuBinary.toFile(w14_plus_r));
@@ -478,9 +491,6 @@ function ui_buildAutomations(ui_automationsMainGroup)
 		ui_motionTrailGroup.enabled = false;
 		if (settings.data.uiMode < 2) ui_motionTrailButton.label.text = 'CC2018';
 	}
-
-	var ui_timeremapButton = DuAEF.DuScriptUI.addButton(settings.data.uiMode > 2 ? ui_automationsFarRightGroup : ui_automationsRightGroup,settings.data.uiMode > 2 ? '' : "Time remap",DuAEF.DuBinary.toFile(w25_timeremap_l),"Enable time remapping",DuAEF.DuBinary.toFile(w25_timeremap_r));
-	ui_timeremapButton.setHelp("Time Remap",timeremapHelp, timeremapLink);
 
 	var ui_effectorButton = DuAEF.DuScriptUI.addButton(settings.data.uiMode > 2 ? ui_automationsLeftGroup : ui_automationsRightGroup,settings.data.uiMode > 2 ? '' : "Effector",DuAEF.DuBinary.toFile(w25_effector_l),"Use an effector to drive properties",DuAEF.DuBinary.toFile(w25_effector_r));
 	ui_effectorButton.setHelp("Effector", effectorHelp, effectorLink);
@@ -500,6 +510,9 @@ function ui_buildAutomations(ui_automationsMainGroup)
 
 	var ui_separateDimensionsButton = DuAEF.DuScriptUI.addButton( ui_automationsRightGroup, settings.data.uiMode > 2 ? '' : "Separate Dimensions", DuAEF.DuBinary.toFile( w25_separatedimensions_l ), "Separates the dimensions of the property in an effect", DuAEF.DuBinary.toFile( w25_separatedimensions_r ) );
 	ui_separateDimensionsButton.setHelp( "Separate Dimensions", separatedimensionsHelp, separatedimensionsLink );
+
+	var ui_timeremapButton = DuAEF.DuScriptUI.addButton(settings.data.uiMode > 2 ? ui_automationsFarRightGroup : ui_automationsRightGroup,settings.data.uiMode > 2 ? '' : "Time remap",DuAEF.DuBinary.toFile(w25_timeremap_l),"Enable time remapping",DuAEF.DuBinary.toFile(w25_timeremap_r));
+	ui_timeremapButton.setHelp("Time Remap",timeremapHelp, timeremapLink);
 
 	//WALK CYCLE
 	var ui_walkCycleOptionsGroup = DuAEF.DuScriptUI.addGroup(ui_automationsMainGroup,'column');
@@ -709,6 +722,8 @@ function ui_buildAutomations(ui_automationsMainGroup)
 	ui_timeremapButton.onClick = ui_timeremapButton_clicked;
 
 	ui_separateDimensionsButton.onClick = ui_separateDimensionsButton_clicked;
+
+	ui_interpolatorButton.onClick = ui_interpolatorButton_clicked;
 
 	debugLog.stopTimer("Automations ready.");
 }

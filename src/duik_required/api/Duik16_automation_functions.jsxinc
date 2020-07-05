@@ -247,3 +247,14 @@ Duik.automation.loop = function ( )
 
     DuAEF.DuAE.App.endUndoGroup();
 }
+
+Duik.automation.functions.push( { name:"Interpolator", fn:"Duik.automation.interpolator()" } );
+/**
+ * Interpolator
+ */
+Duik.automation.interpolator = function ( )
+{
+    DuAEF.DuAE.App.beginUndoGroup("Interpolator");
+    DuAEF.Duik.Automation.interpolator();
+    DuAEF.DuAE.App.endUndoGroup();
+}
